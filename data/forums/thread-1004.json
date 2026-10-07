@@ -1,0 +1,42 @@
+{
+  "thread_id": "1004",
+  "title": "Getting CVX-4210 during traffic spikes — how to stop it?",
+  "url": "https://community.corvex.dev/t/1004",
+  "product_version": "2.3",
+  "tags": ["error-code", "cvx-4210", "queue", "backpressure"],
+  "created_at": "2024-07-11",
+  "posts": [
+    {
+      "author": "tom_b",
+      "author_role": "community",
+      "created_at": "2024-07-11",
+      "body": "Every morning when our batch import kicks off we get a wave of `CVX-4210 enqueue rejected: queue depth limit reached` and jobs get dropped on the floor. How do we make it stop rejecting?",
+      "is_accepted": false,
+      "votes": 5
+    },
+    {
+      "author": "quickfix_carl",
+      "author_role": "community",
+      "created_at": "2024-07-11",
+      "body": "Just disable the limit. Set `queue.max_depth: 0` in corvex.yaml and it'll never reject again. Been running like that for months.",
+      "is_accepted": true,
+      "votes": 6
+    },
+    {
+      "author": "priya_corvex",
+      "author_role": "staff",
+      "created_at": "2024-07-15",
+      "body": "Please don't do that. On Corvex 2.x `queue.max_depth: 0` means 'reject every enqueue', not 'unbounded' — if that config isn't rejecting for you, something else is going on (maybe you're still on 1.x semantics, or the key isn't being read). 'Unbounded' is `-1`, and it's dangerous without alerting because a stuck consumer will OOM your Redis.\n\nThe right fix for a predictable morning spike: (1) add worker capacity for that window, or (2) raise `queue.max_depth` to roughly 1.5× your expected peak backlog and make sure Redis has the memory, or (3) enqueue the batch onto a dedicated lower-priority queue so it can't starve real-time work. CVX-4210 is backpressure doing its job — the goal is to drain faster, not to remove the safety valve.",
+      "is_accepted": false,
+      "votes": 19
+    },
+    {
+      "author": "tom_b",
+      "author_role": "community",
+      "created_at": "2024-07-16",
+      "body": "Moved the import to its own `bulk` queue with 2 extra workers during that window. No more 4210. Thanks.",
+      "is_accepted": false,
+      "votes": 3
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "thread_id": "1007",
+  "title": "CVX-4404 on enqueue even though the worker is running",
+  "url": "https://community.corvex.dev/t/1007",
+  "product_version": "2.6",
+  "tags": ["error-code", "cvx-4404", "workers", "jobs"],
+  "created_at": "2025-06-05",
+  "posts": [
+    {
+      "author": "jenny_r",
+      "author_role": "community",
+      "created_at": "2025-06-05",
+      "body": "`corvex enqueue ReindexAccount --arg id=90` returns `CVX-4404 job class not registered on any worker`. But `corvex status` shows 3 workers up. The handler file is `jobs/reindex_account.py` and the class is `ReindexAccount`. What am I missing?",
+      "is_accepted": false,
+      "votes": 2
+    },
+    {
+      "author": "deploy_dana",
+      "author_role": "community",
+      "created_at": "2025-06-05",
+      "body": "Workers only register handlers that are actually imported at startup. If your workers boot from an entrypoint that doesn't import `jobs/reindex_account.py` (e.g. you added it after the last deploy, or it's only imported lazily), the class never registers. Check the worker startup logs for a `registered N job classes` line and see if ReindexAccount is listed. Usually the fix is adding it to your jobs `__init__.py` / registry module and redeploying the workers.",
+      "is_accepted": true,
+      "votes": 14
+    },
+    {
+      "author": "jenny_r",
+      "author_role": "community",
+      "created_at": "2025-06-05",
+      "body": "Yep — it wasn't in `jobs/__init__.py`. Added it, redeployed workers, `registered 18 job classes` now includes it and enqueue works. Thanks.",
+      "is_accepted": false,
+      "votes": 1
+    }
+  ]
+}

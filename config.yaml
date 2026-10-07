@@ -1,0 +1,190 @@
+# Corvex Multi-Source RAG — single source of truth.
+# Every run stamps a hash of this resolved config into the provenance record.
+
+project:
+  name: corvex-support-rag
+  # The zero-dependency path: backend=local, embedder=hashing, llm=mock.
+  # Nothing here needs Docker, network, or API keys when all three are set that way.
+
+paths:
+  data_dir: data
+  sources_registry: data/sources.yaml
+  evaluation_dir: evaluation
+  logs_dir: logs
+  index_dir: .index          # local backend persistence
+  model_cache_dir: .models   # HF model downloads
+
+product:
+  # Drives version inference during ingestion (see DESIGN.md §0).
+  name: Corvex
+  current_version: "2.6"
+  releases:
+    - {version: "1.0",       date: "2021-03-01"}
+    - {version: "1.5",       date: "2022-01-15"}
+    - {version: "1.9",       date: "2023-02-01"}
+    - {version: "2.0",       date: "2023-11-01"}
+    - {version: "2.3",       date: "2024-08-01"}
+    - {version: "2.6",       date: "2025-05-01"}
+    - {version: "3.0-beta",  date: "2025-08-01"}
+
+# ---------------------------------------------------------------------------
+ingestion:
+  chunking:
+    strategy_version: 1            # part of the chunk-id hash; bump to force re-chunk
+    documentation:
+      chunker: markdown_heading
+      target_tokens: 450
+      max_tokens: 700
+      min_tokens: 60
+      subsplit_overlap_sentences: 1
+      keep_code_blocks_whole: true
+    forums:
+      chunker: thread_aware
+      target_tokens: 350
+      max_tokens: 550
+      drop_reply_below_tokens: 15
+      pair_question_with_accepted_answer: true
+      strip_quotes: true
+    blogs:
+      chunker: heading_then_semantic
+      target_tokens: 600
+      max_tokens: 900
+      semantic_breakpoint_percentile: 90   # only used inside oversized structureless spans
+  enrichment:
+    error_code_regex: 'CVX-\d{3,4}'
+    deprecation_markers: ["deprecated", "removed in", "no longer", "renamed to", "replaced by"]
+    source_authority:                       # starting prior; modulated at query time
+      documentation: 1.0
+      forum: 0.5
+      blog: 0.6
+
+# ---------------------------------------------------------------------------
+embedding:
+  provider: bge               # hashing | bge
+  bge:
+    model: BAAI/bge-small-en-v1.5      # or BAAI/bge-base-en-v1.5
+    query_instruction: "Represent this sentence for searching relevant passages: "
+    normalize: true
+    batch_size: 32
+  hashing:
+    dim: 512                   # deterministic bag-of-hashed-tokens; repro only, not quality
+
+# ---------------------------------------------------------------------------
+index:
+  backend: elastic            # local | elastic
+  local:
+    similarity: cosine
+  elastic:
+    # ELASTIC_HOST env var (from .env) overrides this. For Elastic Cloud Serverless the
+    # endpoint is the Kibana URL with `.kb.` swapped for `.es.`. Local/Docker: :9200.
+    hosts: ["http://localhost:9200"]
+    index_prefix: corvex_rag
+    api_key_env: ELASTIC_API_KEY        # optional; basic-auth via ELASTIC_USER/ELASTIC_PASSWORD
+    use_native_rrf: false              # Decision: support ES 8.x broadly -> Python-side RRF
+                                       # over bm25()+knn(). Set true only on ES >= 8.15.
+    knn_num_candidates: 100
+
+# ---------------------------------------------------------------------------
+retrieval:
+  per_source_bm25_k: 40
+  per_source_vector_k: 40
+  fusion: rrf                  # rrf | weighted
+  rrf_k: 60
+  weighted:                    # used only when fusion=weighted
+    vector_weight: 0.6
+    bm25_weight: 0.4
+  retrieval_floor_k: 2         # min candidates kept per source into reranking
+  recency_half_life_days: 540
+  version_match_boost: 1.35
+  version_stale_penalty: 0.6
+
+source_weighting:
+  mode: static                 # off | static | adaptive
+  # Decision: ship `static` (sch.md priority order). `adaptive` stays implemented and is
+  # switched on only if `corvex-rag ablate --axis source_weighting` shows it beats static.
+  static:                      # sch.md priority order: documentation > forums > blogs
+    documentation: 1.0
+    forum: 0.8
+    blog: 0.6
+  adaptive:                    # multipliers per detected intent
+    documentation_lookup: {documentation: 1.4, forum: 0.7, blog: 0.6}
+    troubleshooting:         {documentation: 0.9, forum: 1.4, blog: 0.8}
+    background_deepdive:     {documentation: 0.8, forum: 0.7, blog: 1.4}
+    default:                 {documentation: 1.0, forum: 0.9, blog: 0.8}
+
+reranker:
+  # Default is the offline `lexical` reranker (deterministic, no model download) to keep the
+  # shipped config on the zero-dependency path. The DESIGN baseline is `bge` — switch to it
+  # (with `pip install -r requirements-optional.txt`) alongside `embedding.provider: bge`.
+  provider: bge               # lexical | bge | cohere | identity
+  top_m_in: 30
+  top_k_out: 7
+  diversity_guard: true
+  bge:
+    model: BAAI/bge-reranker-base
+  cohere:
+    model: rerank-english-v3.0
+    api_key_env: COHERE_API_KEY
+
+# ---------------------------------------------------------------------------
+contradiction:
+  enabled: true
+  candidate_k: 20              # detect on this many merged candidates, not just final top-k,
+                              # then pull the conflicting counterpart into the evidence set
+  topical_cosine_threshold: 0.55
+  nli:
+    enabled: true
+    model: cross-encoder/nli-deberta-v3-base
+  llm_adjudication: false      # per-pair LLM call; enable for max accuracy at higher latency/cost
+  resolution_policy: [version_match, explicit_deprecation, recency, authority]
+
+# ---------------------------------------------------------------------------
+generation:
+  # Decision: Groq is the default generation LLM (free tier). MockLLM is the automatic
+  # fallback when GROQ_API_KEY is unset or the rate limiter is exhausted (rate_limits.groq
+  # .on_exhaustion: mock), and is forced by `llm: mock` for fully-offline CI.
+  llm: groq                    # mock | groq | gemini | anthropic | openai
+  temperature: 0.1
+  max_tokens: 1600
+  groq:
+    model: openai/gpt-oss-120b       
+    api_key_env: GROQ_API_KEY
+  gemini:
+    model: gemini-2.0-flash
+    api_key_env: GEMINI_API_KEY
+  anthropic:
+    model: claude-sonnet-5
+    api_key_env: ANTHROPIC_API_KEY
+  openai:
+    model: gpt-4o-mini
+    api_key_env: OPENAI_API_KEY
+
+self_check:
+  enabled: true
+  max_corrections: 1
+  min_grounding_score: 0.6
+  min_relevance_score: 0.5
+  checks: [grounding, citation_validity, relevance, version_correctness, contradiction, injection_safety]
+
+# ---------------------------------------------------------------------------
+rate_limits:
+  # One bucket per provider; shared by every call site. State persisted to logs/rate_limit_state.json.
+  groq:      {rpm: 25,  rpd: 12000, max_retries: 5, backoff_base_s: 2.0, on_exhaustion: mock}
+  gemini:    {rpm: 12,  rpd: 1400,  max_retries: 5, backoff_base_s: 2.0, on_exhaustion: mock}
+  anthropic: {rpm: 45,  rpd: 100000,max_retries: 5, backoff_base_s: 1.5, on_exhaustion: error}
+  openai:    {rpm: 45,  rpd: 100000,max_retries: 5, backoff_base_s: 1.5, on_exhaustion: error}
+  cohere:    {rpm: 8,   rpd: 900,   max_retries: 4, backoff_base_s: 3.0, on_exhaustion: error}
+
+evaluation:
+  ragas:
+    judge_llm: groq            # single provider for gen + judging (one API key). gemini optional.
+    embeddings: bge
+    cache_dir: logs/ragas_cache
+  retrieval_k: [3, 5, 7, 10]
+
+logging:
+  level: INFO
+  jsonl: true
+  provenance: true
+
+seed: 1729

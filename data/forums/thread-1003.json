@@ -1,0 +1,42 @@
+{
+  "thread_id": "1003",
+  "title": "How long does Corvex keep completed jobs?",
+  "url": "https://community.corvex.dev/t/1003",
+  "product_version": "2.5",
+  "tags": ["retention", "storage", "pruning"],
+  "created_at": "2025-01-20",
+  "posts": [
+    {
+      "author": "ravi_p",
+      "author_role": "community",
+      "created_at": "2025-01-20",
+      "body": "Trying to figure out how much Redis memory to budget. How long are completed jobs stored before Corvex deletes them? On 2.5.",
+      "is_accepted": false,
+      "votes": 3
+    },
+    {
+      "author": "old_hand_42",
+      "author_role": "community",
+      "created_at": "2025-01-20",
+      "body": "Corvex keeps completed jobs forever by default — they just accumulate until you run `corvex purge` manually. That's why the Redis instance keeps growing. We cron `corvex purge` nightly.",
+      "is_accepted": false,
+      "votes": 1
+    },
+    {
+      "author": "nadia_corvex",
+      "author_role": "staff",
+      "created_at": "2025-01-21",
+      "body": "That's not right for 2.x. On Corvex 2.x completed jobs are pruned automatically after `retention.completed`, which defaults to **24h**. The pruner runs every 10 minutes; `corvex prune` (renamed from `corvex purge` in 2.0) just triggers it early. Failed jobs default to `retention.failed: 168h`. The 'keeps forever' behaviour was never a default — in 1.x the key was `keep_completed_days` with a default of 7 days. If you want more than a day of history on 2.x, set `retention.completed: 168h` explicitly.",
+      "is_accepted": true,
+      "votes": 22
+    },
+    {
+      "author": "ravi_p",
+      "author_role": "community",
+      "created_at": "2025-01-21",
+      "body": "Thanks — 24h default explains the memory profile we're seeing. Bumped it to 72h.",
+      "is_accepted": false,
+      "votes": 2
+    }
+  ]
+}

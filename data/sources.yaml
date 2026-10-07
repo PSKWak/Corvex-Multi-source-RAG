@@ -1,0 +1,44 @@
+# Source registry. `product_version` here is the *stated/primary* version for the whole
+# document; per-chunk version inference (ingest/metadata.py) can still override per section.
+# author_role: staff | community | null
+
+documentation:
+  base_url: "https://docs.corvex.dev"
+  default_version: "2.6"
+  items:
+    - {id: doc-getting-started,       path: documentation/01-getting-started.md,        url: "/getting-started",            version: "2.6"}
+    - {id: doc-config-reference,      path: documentation/02-configuration-reference.md, url: "/reference/configuration",    version: "2.6"}
+    - {id: doc-cli-reference,         path: documentation/03-cli-reference.md,           url: "/reference/cli",             version: "2.6"}
+    - {id: doc-error-codes,           path: documentation/04-error-codes.md,             url: "/reference/error-codes",     version: "2.6"}
+    - {id: doc-authentication,        path: documentation/05-authentication.md,          url: "/guides/authentication",     version: "2.6"}
+    - {id: doc-workers-concurrency,   path: documentation/06-workers-and-concurrency.md, url: "/guides/workers",            version: "2.6"}
+    - {id: doc-retention-storage,     path: documentation/07-job-retention-and-storage.md, url: "/guides/retention",        version: "2.6"}
+    - {id: doc-upgrading-v1-v2,       path: documentation/08-upgrading-v1-to-v2.md,      url: "/guides/upgrade-2.0",        version: "2.6"}
+    - {id: doc-high-throughput,       path: documentation/09-high-throughput-tuning.md,  url: "/guides/high-throughput",    version: "2.6"}
+    - {id: doc-observability,         path: documentation/10-observability.md,           url: "/guides/observability",      version: "2.6"}
+
+forums:
+  base_url: "https://community.corvex.dev/t"
+  items:
+    - {id: forum-1001, path: forums/thread-1001.json, url: "/1001"}
+    - {id: forum-1002, path: forums/thread-1002.json, url: "/1002"}
+    - {id: forum-1003, path: forums/thread-1003.json, url: "/1003"}
+    - {id: forum-1004, path: forums/thread-1004.json, url: "/1004"}
+    - {id: forum-1005, path: forums/thread-1005.json, url: "/1005"}
+    - {id: forum-1006, path: forums/thread-1006.json, url: "/1006"}
+    - {id: forum-1007, path: forums/thread-1007.json, url: "/1007"}
+    - {id: forum-1008, path: forums/thread-1008.json, url: "/1008"}
+    - {id: forum-1009, path: forums/thread-1009.json, url: "/1009"}
+    - {id: forum-1010, path: forums/thread-1010.json, url: "/1010"}
+    - {id: forum-1011, path: forums/thread-1011.json, url: "/1011"}
+    - {id: forum-1012, path: forums/thread-1012.json, url: "/1012"}
+
+blogs:
+  base_url: "https://blog.corvex.dev"
+  items:
+    - {id: blog-2023-01-getting-started, path: blogs/2023-01-getting-started-with-corvex.md,      url: "/2023/01/getting-started",          publish_date: "2023-01-18", version: "1.9", author_role: staff}
+    - {id: blog-2023-06-scaling-50k,     path: blogs/2023-06-scaling-corvex-to-50k-jobs-per-sec.md, url: "/2023/06/scaling-to-50k",         publish_date: "2023-06-27", version: "1.9", author_role: staff}
+    - {id: blog-2024-02-migrating-v2,    path: blogs/2024-02-migrating-to-corvex-v2.md,           url: "/2024/02/migrating-to-v2",          publish_date: "2024-02-09", version: "2.0", author_role: staff}
+    - {id: blog-2024-09-backpressure,    path: blogs/2024-09-backpressure-and-dead-letter-queues.md, url: "/2024/09/backpressure",          publish_date: "2024-09-30", version: "2.3", author_role: community}
+    - {id: blog-2025-03-scheduler,       path: blogs/2025-03-corvex-internals-the-scheduler.md,   url: "/2025/03/scheduler-internals",      publish_date: "2025-03-11", version: "2.3", author_role: staff}
+    - {id: blog-2025-07-worker-pools,    path: blogs/2025-07-tuning-worker-pools.md,              url: "/2025/07/tuning-worker-pools",      publish_date: "2025-07-22", version: "2.6", author_role: community}

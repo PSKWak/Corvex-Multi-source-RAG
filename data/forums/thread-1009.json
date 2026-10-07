@@ -1,0 +1,34 @@
+{
+  "thread_id": "1009",
+  "title": "Workers at 15% CPU but the queue keeps growing — what gives?",
+  "url": "https://community.corvex.dev/t/1009",
+  "product_version": "2.6",
+  "tags": ["performance", "throughput", "redis", "pool"],
+  "created_at": "2025-08-12",
+  "posts": [
+    {
+      "author": "scale_sarah",
+      "author_role": "community",
+      "created_at": "2025-08-12",
+      "body": "Pushing ~30k jobs/sec. We have 6 worker hosts, `workers.concurrency: 32` each. CPU on the workers sits around 15%, but `corvex_queue_depth` climbs all day. Adding more workers doesn't help. Jobs themselves are fast (~5ms, mostly an HTTP call). Where's the bottleneck?",
+      "is_accepted": false,
+      "votes": 6
+    },
+    {
+      "author": "redis_ron",
+      "author_role": "community",
+      "created_at": "2025-08-12",
+      "body": "Classic connection-pool starvation. Every busy job slot holds one Redis connection. You have 6 × 32 = 192 slots per host but `storage.redis.pool_size` defaults to 10, so 182 slots are constantly parked waiting for a connection — that's why CPU is low and more workers make it worse (more contention, same pool). Check `corvex_storage_pool_wait_seconds`; I bet p50 is well above zero.\n\nSet `storage.redis.pool_size` to at least `concurrency + 4` (so ~36), make sure your Redis `maxclients` and the OS file-descriptor limit can take 6 × 36 connections, and also switch to batch enqueue (`POST /api/v1/jobs:batch`) if you're enqueuing one at a time.",
+      "is_accepted": true,
+      "votes": 21
+    },
+    {
+      "author": "scale_sarah",
+      "author_role": "community",
+      "created_at": "2025-08-13",
+      "body": "`pool_size: 40` and the queue drained in minutes. `pool_wait_seconds` p50 was 0.8s before, ~0 now. Thank you.",
+      "is_accepted": false,
+      "votes": 3
+    }
+  ]
+}

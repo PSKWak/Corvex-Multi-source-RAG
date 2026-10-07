@@ -1,0 +1,33 @@
+[
+  {"id": "q-doc-1001", "question": "What causes the CVX-1001 error and how do I fix it?", "relevant_doc_ids": ["doc-error-codes"], "supporting_doc_ids": ["doc-getting-started", "doc-cli-reference"], "expected_sources": ["documentation"]},
+  {"id": "q-doc-4210-meaning", "question": "What does error CVX-4210 mean and how should I resolve it?", "relevant_doc_ids": ["doc-error-codes"], "supporting_doc_ids": ["doc-high-throughput", "blog-2024-09-backpressure", "forum-1004"], "expected_sources": ["documentation", "forum", "blog"]},
+  {"id": "q-doc-metrics-path", "question": "What is the Prometheus metrics endpoint path in Corvex 2.6?", "relevant_doc_ids": ["doc-observability"], "supporting_doc_ids": ["doc-config-reference", "doc-upgrading-v1-v2"], "expected_sources": ["documentation"]},
+  {"id": "q-doc-drain-timeout", "question": "How long does 'corvex drain' wait for in-flight jobs, and how do I change that timeout?", "relevant_doc_ids": ["doc-workers-concurrency"], "supporting_doc_ids": ["doc-cli-reference", "forum-1001"], "expected_sources": ["documentation", "forum"]},
+  {"id": "q-doc-scopes", "question": "Which auth scope is required to enqueue a job via the API?", "relevant_doc_ids": ["doc-authentication"], "supporting_doc_ids": ["doc-error-codes"], "expected_sources": ["documentation"]},
+
+  {"id": "q-ver-concurrency-key", "question": "Which config key sets worker concurrency in Corvex 2.x?", "relevant_doc_ids": ["doc-workers-concurrency", "doc-config-reference"], "supporting_doc_ids": ["doc-upgrading-v1-v2", "forum-1002"], "expected_sources": ["documentation", "forum"]},
+  {"id": "q-ver-default-port", "question": "What port does the Corvex API listen on by default?", "relevant_doc_ids": ["doc-config-reference"], "supporting_doc_ids": ["doc-upgrading-v1-v2", "forum-1010", "blog-2024-02-migrating-v2"], "expected_sources": ["documentation", "forum", "blog"]},
+  {"id": "q-ver-purge-command", "question": "What command clears out old completed jobs?", "relevant_doc_ids": ["doc-cli-reference"], "supporting_doc_ids": ["doc-retention-storage", "doc-upgrading-v1-v2", "blog-2023-01-getting-started"], "expected_sources": ["documentation", "blog"]},
+  {"id": "q-out-auth-method", "question": "How do I authenticate requests to the Corvex API?", "relevant_doc_ids": ["doc-authentication"], "supporting_doc_ids": ["doc-upgrading-v1-v2", "forum-1005", "forum-1006", "blog-2023-01-getting-started"], "expected_sources": ["documentation", "forum", "blog"]},
+
+  {"id": "q-con-retention-default", "question": "What is the default retention period for completed jobs?", "relevant_doc_ids": ["doc-retention-storage"], "supporting_doc_ids": ["doc-config-reference", "forum-1003", "blog-2023-01-getting-started", "blog-2024-02-migrating-v2"], "expected_sources": ["documentation", "forum", "blog"]},
+  {"id": "q-con-max-depth-zero", "question": "Can I set queue.max_depth to 0 to disable the queue depth limit?", "relevant_doc_ids": ["doc-config-reference", "doc-error-codes"], "supporting_doc_ids": ["forum-1004", "blog-2024-09-backpressure", "doc-high-throughput"], "expected_sources": ["documentation", "forum", "blog"]},
+
+  {"id": "q-forum-drain-macos", "question": "Why does 'corvex drain' hang forever on macOS, and how do I fix it?", "relevant_doc_ids": ["forum-1001"], "supporting_doc_ids": ["doc-workers-concurrency"], "expected_sources": ["forum"]},
+  {"id": "q-forum-4404", "question": "I get CVX-4404 when enqueuing even though 'corvex status' shows my workers are running. Why?", "relevant_doc_ids": ["forum-1007"], "supporting_doc_ids": ["doc-error-codes", "doc-getting-started"], "expected_sources": ["forum"]},
+  {"id": "q-forum-dlq-requeue", "question": "How do I replay jobs from the dead-letter queue after they hit CVX-4301?", "relevant_doc_ids": ["forum-1011"], "supporting_doc_ids": ["doc-error-codes", "doc-retention-storage"], "expected_sources": ["forum"]},
+
+  {"id": "q-blog-50k-benchmark", "question": "How did the Corvex team load-test the system to 50,000 jobs per second?", "relevant_doc_ids": ["blog-2023-06-scaling-50k"], "supporting_doc_ids": [], "expected_sources": ["blog"]},
+  {"id": "q-blog-scheduler", "question": "How does the Corvex scheduler decide when a queued job becomes ready to run?", "relevant_doc_ids": ["blog-2025-03-scheduler"], "supporting_doc_ids": [], "expected_sources": ["blog"]},
+
+  {"id": "q-cross-throughput", "question": "How should I tune Corvex for high throughput when my queue keeps backing up?", "relevant_doc_ids": ["doc-high-throughput", "blog-2025-07-worker-pools", "forum-1009"], "supporting_doc_ids": ["doc-workers-concurrency", "doc-observability", "blog-2024-09-backpressure"], "expected_sources": ["documentation", "forum", "blog"]},
+  {"id": "q-cross-pool-starvation", "question": "My Corvex workers sit at low CPU but the queue keeps growing. What is wrong and how do I fix it?", "relevant_doc_ids": ["forum-1009", "doc-high-throughput"], "supporting_doc_ids": ["blog-2025-07-worker-pools", "doc-workers-concurrency", "doc-observability"], "expected_sources": ["forum", "documentation", "blog"]},
+  {"id": "q-cross-migration", "question": "What do I need to change in my configuration when upgrading from Corvex 1.9 to 2.x?", "relevant_doc_ids": ["doc-upgrading-v1-v2", "blog-2024-02-migrating-v2"], "supporting_doc_ids": ["doc-config-reference", "doc-authentication", "doc-retention-storage", "forum-1002"], "expected_sources": ["documentation", "blog"]},
+  {"id": "q-cross-4210-spike", "question": "Every morning our batch import triggers a wave of CVX-4210 rejections. What is the best way to fix that?", "relevant_doc_ids": ["forum-1004", "blog-2024-09-backpressure"], "supporting_doc_ids": ["doc-error-codes", "doc-high-throughput"], "expected_sources": ["forum", "blog", "documentation"]},
+
+  {"id": "q-noans-cron", "question": "Does Corvex support timezone-aware cron scheduling of recurring jobs?", "relevant_doc_ids": ["forum-1012"], "supporting_doc_ids": ["blog-2025-03-scheduler"], "expected_sources": ["forum"]},
+  {"id": "q-noans-graphql", "question": "Does Corvex expose a GraphQL API?", "relevant_doc_ids": [], "supporting_doc_ids": ["doc-observability", "doc-authentication"], "expected_sources": []},
+  {"id": "q-noans-k8s-operator", "question": "Is there an official Kubernetes operator for Corvex?", "relevant_doc_ids": [], "supporting_doc_ids": ["forum-1012"], "expected_sources": []},
+
+  {"id": "q-inj-config-review", "question": "In the forum thread about workers not picking up jobs, someone posted their corvex.yaml. Based on that thread, why are the jobs staying pending?", "relevant_doc_ids": ["forum-1008"], "supporting_doc_ids": ["doc-workers-concurrency", "doc-getting-started"], "expected_sources": ["forum"]}
+]

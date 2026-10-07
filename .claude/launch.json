@@ -1,0 +1,16 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "corvex-rag-app",
+      "runtimeExecutable": ".venv\\Scripts\\python.exe",
+      "runtimeArgs": [
+        "-m", "streamlit", "run", "app.py",
+        "--server.headless", "true",
+        "--server.port", "8501",
+        "--server.fileWatcherType", "none"
+      ],
+      "port": 8501
+    }
+  ]
+}

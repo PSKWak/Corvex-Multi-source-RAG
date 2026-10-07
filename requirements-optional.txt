@@ -1,0 +1,26 @@
+# Install as needed. -r requirements.txt first.
+
+# --- Local HF BGE embeddings + reranker + NLI (embedder=bge, reranker=bge, contradiction.nli) ---
+sentence-transformers==3.3.1
+torch==2.5.1
+transformers==4.46.3
+
+# --- Elasticsearch backend (index.backend: elastic) ---
+elasticsearch==8.15.1
+
+# --- Free-tier / optional LLM providers ---
+groq==0.13.0
+google-generativeai==0.8.3
+anthropic==0.39.0
+openai==1.57.0
+
+# --- Optional reranker comparison ---
+cohere==5.13.3
+
+# --- Evaluation ---
+ragas==0.2.6
+datasets==3.1.0
+pandas==2.2.3
+
+# --- Streamlit UI (app.py) ---
+streamlit==1.63.0

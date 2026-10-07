@@ -1,0 +1,76 @@
+[
+  {
+    "id": "C1-retention-default",
+    "question": "What is the default retention period for completed jobs?",
+    "conflicting_sources": [
+      {"source_id": "doc-retention-storage", "claim": "retention.completed defaults to 24h (Corvex 2.x)", "version": "2.6"},
+      {"source_id": "blog-2023-01-getting-started", "claim": "Corvex keeps completed jobs for 7 days out of the box", "version": "1.9"},
+      {"source_id": "forum-1003", "claim": "Corvex keeps completed jobs forever until you run corvex purge", "version": "2.5"}
+    ],
+    "expected_conflict_type": ["version", "value"],
+    "expected_resolution_rule": "version_match",
+    "expected_winner_source": "doc-retention-storage",
+    "expected_answer_contains": ["24h", "retention.completed"],
+    "expected_answer_notes": ["1.x default was 7 days (keep_completed_days)", "the 'forever' forum claim is incorrect"],
+    "must_not_contain": ["Corvex keeps completed jobs forever by default"]
+  },
+  {
+    "id": "C2-concurrency-key",
+    "question": "What config key controls how many jobs a worker runs concurrently?",
+    "conflicting_sources": [
+      {"source_id": "doc-workers-concurrency", "claim": "workers.concurrency (nested), default = CPU cores", "version": "2.6"},
+      {"source_id": "forum-1002", "claim": "top-level worker_threads, default 4", "version": "1.7"}
+    ],
+    "expected_conflict_type": ["version"],
+    "expected_resolution_rule": "version_match",
+    "expected_winner_source": "doc-workers-concurrency",
+    "expected_answer_contains": ["workers.concurrency"],
+    "expected_answer_notes": ["worker_threads was the 1.x name", "renamed in 2.0"],
+    "must_not_contain": []
+  },
+  {
+    "id": "C3-auth-method",
+    "question": "How do I pass the auth token when calling the Corvex API?",
+    "conflicting_sources": [
+      {"source_id": "doc-authentication", "claim": "Authorization: Bearer <token> header; query param removed in 2.0", "version": "2.6"},
+      {"source_id": "blog-2023-01-getting-started", "claim": "pass ?token=<token> on the query string", "version": "1.9"},
+      {"source_id": "forum-1006", "claim": "stick the token on the query string: ?token=", "version": "1.8"}
+    ],
+    "expected_conflict_type": ["version", "deprecation"],
+    "expected_resolution_rule": "explicit_deprecation",
+    "expected_winner_source": "doc-authentication",
+    "expected_answer_contains": ["Authorization: Bearer"],
+    "expected_answer_notes": ["?token= worked in 1.x", "removed in 2.0", "now returns CVX-2001"],
+    "must_not_contain": []
+  },
+  {
+    "id": "C4-default-port",
+    "question": "What port does the Corvex API listen on by default?",
+    "conflicting_sources": [
+      {"source_id": "doc-config-reference", "claim": "0.0.0.0:8577 (default changed from 9000 in 2.0)", "version": "2.6"},
+      {"source_id": "forum-1010", "claim": "9000 was the 1.x default; 8577 since 2.0", "version": "2.2"},
+      {"source_id": "blog-2023-01-getting-started", "claim": "http_port: 9000", "version": "1.9"}
+    ],
+    "expected_conflict_type": ["version"],
+    "expected_resolution_rule": "version_match",
+    "expected_winner_source": "doc-config-reference",
+    "expected_answer_contains": ["8577"],
+    "expected_answer_notes": ["9000 was the 1.x default"],
+    "must_not_contain": []
+  },
+  {
+    "id": "C5-max-depth-zero",
+    "question": "How do I stop Corvex from rejecting enqueues with CVX-4210?",
+    "conflicting_sources": [
+      {"source_id": "forum-1004", "claim": "set queue.max_depth: 0 and it will never reject again", "version": "2.3"},
+      {"source_id": "doc-error-codes", "claim": "do not set queue.max_depth: 0 (rejects all in 2.x); add workers or raise the limit", "version": "2.6"},
+      {"source_id": "blog-2024-09-backpressure", "claim": "max_depth: 0 rejects every enqueue; use tiered queues + capacity", "version": "2.3"}
+    ],
+    "expected_conflict_type": ["value"],
+    "expected_resolution_rule": "authority",
+    "expected_winner_source": "doc-error-codes",
+    "expected_answer_contains": ["add worker", "not"],
+    "expected_answer_notes": ["the forum accepted answer recommending max_depth: 0 is harmful for 2.x", "-1 is unbounded"],
+    "must_not_contain": ["set queue.max_depth: 0 and it'll never reject"]
+  }
+]

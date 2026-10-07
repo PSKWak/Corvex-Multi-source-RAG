@@ -1,0 +1,11 @@
+# Core — the zero-dependency path (backend=local, embedder=hashing, llm=mock) runs on just these.
+pyyaml==6.0.2
+numpy==2.1.3
+rank-bm25==0.2.2
+python-dotenv==1.0.1
+tiktoken==0.8.0
+pydantic==2.9.2
+structlog==24.4.0
+tenacity==9.0.0
+markdown-it-py==3.0.0
+rich==13.9.4

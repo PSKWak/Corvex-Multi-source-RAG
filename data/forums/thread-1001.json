@@ -1,0 +1,42 @@
+{
+  "thread_id": "1001",
+  "title": "corvex drain hangs forever on macOS (Redis 7.2)",
+  "url": "https://community.corvex.dev/t/1001",
+  "product_version": "2.4",
+  "tags": ["cli", "macos", "redis", "shutdown"],
+  "created_at": "2024-10-03",
+  "posts": [
+    {
+      "author": "devon_k",
+      "author_role": "community",
+      "created_at": "2024-10-03",
+      "body": "On my Mac (M2, Sonoma) `corvex drain` never returns. It prints `draining: waiting for 0 in-flight jobs` and just sits there. Ctrl-C is the only way out. Same config on our Linux CI drains in about a second. Redis is 7.2.4 from Homebrew. Corvex 2.4.1.",
+      "is_accepted": false,
+      "votes": 4
+    },
+    {
+      "author": "mira_s",
+      "author_role": "community",
+      "created_at": "2024-10-03",
+      "body": "Confirmed here too, also M-series + Homebrew Redis 7.2. It's a keyspace-notification thing: Corvex 2.4 waits on a Redis `BLPOP` for the shutdown ack, and Homebrew's Redis 7.2 ships with `notify-keyspace-events` empty AND has a quirk where a blocking pop on a nonexistent key never times out under the macOS build. Workaround that fixed it for me: set `CORVEX_DRAIN_TIMEOUT=15s` so the drain gives up waiting and exits cleanly. You can also run `redis-server --notify-keyspace-events KEA`.",
+      "is_accepted": true,
+      "votes": 27
+    },
+    {
+      "author": "devon_k",
+      "author_role": "community",
+      "created_at": "2024-10-04",
+      "body": "`CORVEX_DRAIN_TIMEOUT=15s` works. Thanks!",
+      "is_accepted": false,
+      "votes": 1
+    },
+    {
+      "author": "priya_corvex",
+      "author_role": "staff",
+      "created_at": "2024-10-08",
+      "body": "Tracked as CORVEX-3311. The blocking-ack path was replaced with a polled ack in 2.5.0, so upgrading also fixes this. On 2.4.x the `CORVEX_DRAIN_TIMEOUT` workaround above is the right call. This only reproduces on the macOS arm64 Redis build; Linux and the official Redis Docker image are unaffected.",
+      "is_accepted": false,
+      "votes": 12
+    }
+  ]
+}

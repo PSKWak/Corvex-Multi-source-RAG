@@ -1,0 +1,26 @@
+{
+  "thread_id": "1011",
+  "title": "Recovering jobs from the dead-letter queue after CVX-4301",
+  "url": "https://community.corvex.dev/t/1011",
+  "product_version": "2.6",
+  "tags": ["error-code", "cvx-4301", "dlq", "retries"],
+  "created_at": "2025-05-28",
+  "posts": [
+    {
+      "author": "on_call_omar",
+      "author_role": "community",
+      "created_at": "2025-05-28",
+      "body": "A downstream API was down for an hour and ~2000 jobs hit `CVX-4301` and went to the dead-letter queue. The API is back. How do I replay them, and can I stop this happening next time?",
+      "is_accepted": false,
+      "votes": 4
+    },
+    {
+      "author": "nadia_corvex",
+      "author_role": "staff",
+      "created_at": "2025-05-28",
+      "body": "Replay: `corvex dlq requeue --queue <name> --all` (needs the `dlq:manage` scope), or filter by class with `--class SyncOrder`. They go back on the original queue with their retry counter reset.\n\nPrevention for known-flaky dependencies: raise `queue.max_retries` for that queue, switch `queue.retry_backoff` to `exponential` if it isn't already, and consider a circuit-breaker in the job so a dependency outage fails fast and reschedules with a longer delay instead of burning all 5 attempts in a minute. Failed jobs are kept for `retention.failed` (default 168h) so you have a week to replay.",
+      "is_accepted": true,
+      "votes": 17
+    }
+  ]
+}

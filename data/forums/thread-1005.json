@@ -1,0 +1,34 @@
+{
+  "thread_id": "1005",
+  "title": "All API calls return CVX-2001 after upgrading to 2.0",
+  "url": "https://community.corvex.dev/t/1005",
+  "product_version": "2.0",
+  "tags": ["error-code", "cvx-2001", "auth", "upgrade"],
+  "created_at": "2023-12-02",
+  "posts": [
+    {
+      "author": "hlee",
+      "author_role": "community",
+      "created_at": "2023-12-02",
+      "body": "Upgraded from 1.9 to 2.0 last night. The server starts fine, workers are running, but every API call from our scripts now returns `CVX-2001 missing or invalid authentication token`. The token hasn't changed and it's definitely in `auth.tokens`. What did 2.0 change?",
+      "is_accepted": false,
+      "votes": 7
+    },
+    {
+      "author": "gwen_h",
+      "author_role": "community",
+      "created_at": "2023-12-02",
+      "body": "2.0 removed the `?token=` query-parameter auth. Your scripts are almost certainly still doing `curl \"http://host:8577/api/v1/jobs?token=abc\"`. You have to send it as a header now:\n\n```bash\ncurl -H \"Authorization: Bearer abc\" http://host:8577/api/v1/jobs\n```\n\nThat's the only auth change that causes a blanket 2001 right after upgrade.",
+      "is_accepted": true,
+      "votes": 24
+    },
+    {
+      "author": "hlee",
+      "author_role": "community",
+      "created_at": "2023-12-02",
+      "body": "That was it. Every script and our Grafana check used the query param. Migrated them all to the header. Thanks.",
+      "is_accepted": false,
+      "votes": 2
+    }
+  ]
+}

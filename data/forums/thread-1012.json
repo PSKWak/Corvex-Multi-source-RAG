@@ -1,0 +1,26 @@
+{
+  "thread_id": "1012",
+  "title": "Native cron / scheduled recurring jobs with timezone support?",
+  "url": "https://community.corvex.dev/t/1012",
+  "product_version": "2.6",
+  "tags": ["scheduling", "cron", "roadmap"],
+  "created_at": "2025-08-20",
+  "posts": [
+    {
+      "author": "planner_pat",
+      "author_role": "community",
+      "created_at": "2025-08-20",
+      "body": "Does Corvex have built-in recurring/cron jobs — 'run ReportJob every weekday at 09:00 America/New_York'? I only see one-off `enqueue` and delayed enqueue (`--in 5m`).",
+      "is_accepted": false,
+      "votes": 5
+    },
+    {
+      "author": "nadia_corvex",
+      "author_role": "staff",
+      "created_at": "2025-08-21",
+      "body": "Not in 2.6. Corvex has one-off enqueue and delayed enqueue (`--in <duration>` / `--at <timestamp>`), but there is no native cron scheduler and no timezone-aware recurrence. People currently drive recurring work from an external scheduler (system cron, k8s CronJob, etc.) that calls `corvex enqueue`. A native periodic scheduler is on the roadmap but not committed to a release, and there's no timezone handling design yet.",
+      "is_accepted": true,
+      "votes": 8
+    }
+  ]
+}
